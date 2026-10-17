@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F5F4F0">
+<title>Nestwise · Melbourne Property</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Serif+SC:wght@500;600&display=swap">
+<link rel="stylesheet" href="/static/app.css?v=ios-20261003-3">
+
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}
+</script>
+</head>
+<body>
+
+
+<div id="app" data-stage="welcome">
+  <header class="top">
+    
+    <button type="button" class="brand" id="brand-home" aria-label="Nestwise" disabled><span class="brand-wordmark"><span class="brand-name">Nestwise</span><span class="brand-ai" aria-hidden="true">AI</span></span><span class="brand-tagline">A BETTER HOME</span></button>
+    <div class="top-actions">
+      <button id="btn-lang" class="link lang" type="button" title="Switch to English">EN</button>
+      <button id="btn-new" class="link" type="button">New chat</button>
+      
+      <button id="btn-favs" class="favs-open" type="button" hidden><svg class="fav-icon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.4 8 3.3 4.6 6.8 4.6c2.1 0 3.6 1.2 4.4 2.5.8-1.3 2.3-2.5 4.4-2.5 3.5 0 5.4 3.4 4.1 6.7-1.8 4.6-9.3 9.2-9.3 9.2z"/></svg><span class="favs-count">0</span></button>
+      
+      <button id="btn-auth" class="auth-open" type="button" hidden>Log in</button>
+      <div class="auth-user" id="auth-user" hidden>
+        <button id="btn-user" class="auth-user-btn" type="button" aria-haspopup="menu" aria-expanded="false">
+          <span class="auth-avatar" aria-hidden="true"></span><span class="auth-user-name"></span>
+        </button>
+        <div class="auth-menu" id="auth-menu" role="menu" hidden>
+          <div class="auth-menu-who"><b></b><span></span></div>
+          <button id="btn-menu-favs" type="button" role="menuitem">Saved homes</button>
+          <button id="btn-logout" type="button" role="menuitem">Log out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="col col-chat">
+      
+
+
+      <div id="welcome" class="welcome">
+        <div class="hero-rail" aria-hidden="true">
+          <ol class="rail-index">
+            <li class="on"><b>01</b><span id="rail-1">Search</span></li>
+            <li><b>02</b><span id="rail-2">Living</span></li>
+            <li><b>03</b><span id="rail-3">Community</span></li>
+            <li><b>04</b><span id="rail-4">Insights</span></li>
+          </ol>
+          <div class="rail-foot"><span>AI</span><span>FOR A BETTER HOME</span></div>
+        </div>
+        <div class="hero-copy" data-drift-avoid>
+          <h1 class="welcome-h">A better home <br>starts with a question.</h1>
+          <p class="welcome-p">Enter a budget, a suburb, or a preference.<br>Every figure is measured, assumption-checked, or model-estimated.</p>
+        </div>
+        
+
+        <div id="showroom" class="showroom">
+          <div id="showroom-view" class="showroom-view" aria-hidden="true"></div>
+          <div id="showroom-signs" class="showroom-signs"></div>
+          
+          <button type="button" class="sr-arrow sr-next" data-on="true" aria-label="Explore home styles">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"></path></svg>
+          </button>
+          <button type="button" class="sr-arrow sr-back" data-on="false" aria-label="Back to the city">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"></path></svg>
+          </button>
+        </div>
+        <div id="hero-city" class="hero-city">
+          <svg id="city-svg" class="city-svg" aria-hidden="true"></svg>
+          <div id="driftfield" class="driftfield" role="group" aria-labelledby="drift-label" aria-live="off"></div>
+        </div>
+      </div>
+      <div id="chat" class="chat"></div>
+      <div id="condition-dock" class="condition-dock"></div>
+      <form id="composer" class="composer" autocomplete="off" data-drift-avoid>
+        <svg class="composer-ico" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"></circle><path d="M20 20l-4.8-4.8"></path></svg>
+        <input id="input" type="text" placeholder="Budget, suburb or preference — e.g. Under $1M · 3 bed" enterkeyhint="send">
+        <button type="submit" class="send" aria-label="Send">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"></path><path d="M5 12l7-7 7 7"></path></svg>
+        </button>
+      </form>
+      <div id="follow-ups" class="follow-ups"></div>
+      <div class="drift-caption" data-drift-avoid>
+        <span class="dc-led" aria-hidden="true"></span>
+        <span id="drift-label">A few ideas to get you started</span>
+        <button id="btn-drift" type="button" aria-controls="driftfield" aria-pressed="false">Pause suggestions</button>
+      </div>
+      <div class="hero-foot" aria-hidden="true"><span id="hero-foot">HOME · LIFE · POSSIBILITY</span></div>
+      <div class="hero-meta" aria-hidden="true"><span>NESTWISE <i></i></span><span>MELBOURNE <i class="fill"></i></span></div>
+    </section>
+
+    <section class="col col-results">
+      <div id="results" class="results"></div>
+    </section>
+
+    
+
+
+    <section class="col col-map">
+      <div class="map-panel">
+        <div class="map-bar map-head">
+          <span class="mb-title">/ MAP.VIEW</span>
+          <span class="mb-coord" aria-hidden="true">COORDINATES <span id="map-coord">-37.8136, 144.9631</span></span>
+        </div>
+        <div class="map-wrap">
+          <div id="map" class="map"></div>
+          <div class="map-frost" aria-hidden="true"></div>
+          <div class="map-glass" aria-hidden="true"></div>
+          <div class="map-ctl" role="group">
+            <button type="button" id="map-fit" class="map-ctl-btn"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="5.2"/><circle cx="10" cy="10" r="1.6" class="dot"/><path d="M10 1.8v3M10 15.2v3M1.8 10h3M15.2 10h3"/></svg></button>
+            <i class="map-ctl-sep"></i>
+            <button type="button" id="map-zin" class="map-ctl-btn"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4.5v11M4.5 10h11"/></svg></button>
+            <button type="button" id="map-zout" class="map-ctl-btn"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 10h11"/></svg></button>
+          </div>
+          <div class="map-attr"><span class="attr-vector" hidden><a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener">© OpenMapTiles</a> · </span><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a></div>
+        </div>
+        <div class="map-bar map-foot">
+          <div class="city">
+            <button type="button" id="city-btn" class="city-btn" aria-haspopup="listbox" aria-expanded="false"><span id="city-name">MELBOURNE</span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.6 6 7.6l3-3"/></svg></button>
+            <ul id="city-menu" class="city-menu" role="listbox" hidden></ul>
+          </div>
+          <i class="mb-sep" aria-hidden="true"></i>
+          <span id="map-count" class="mb-count"></span>
+        </div>
+      </div>
+    </section>
+
+    
+
+    <aside id="detail" class="detail" aria-label="Property details"></aside>
+  </main>
+
+  <div id="backdrop" class="backdrop"></div>
+  <div id="popover" class="popover"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js">
+</script>
+
+  
+  <dialog id="auth" class="auth" aria-labelledby="auth-title" data-mode="login">
+    <div class="auth-card">
+      <div class="auth-head">
+        <div class="auth-brand"><span class="brand-wordmark"><span class="brand-name">Nestwise</span><span class="brand-ai" aria-hidden="true">AI</span></span><span class="auth-tagline" data-t="tagline">A BETTER HOME</span></div>
+        <button type="button" class="auth-close" id="auth-close" aria-label="Close"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+      </div>
+      <h2 class="auth-title" id="auth-title">Welcome back</h2>
+      <p class="auth-sub" id="auth-sub">Log in to Nestwise with your username or email.</p>
+      <form id="auth-form" class="auth-form" novalidate>
+        <div class="auth-field" data-only="login"><label for="auth-login" data-t="login">Username or email</label>
+          <input id="auth-login" name="login" type="text" autocomplete="username" maxlength="254" autocapitalize="off" spellcheck="false">
+          <p class="auth-msg" id="auth-login-msg"></p></div>
+        <div class="auth-field" data-only="register"><label for="auth-username" data-t="username">Username</label>
+          <input id="auth-username" name="username" type="text" autocomplete="username" maxlength="20" autocapitalize="off" spellcheck="false" aria-describedby="auth-username-msg">
+          <p class="auth-msg" id="auth-username-msg" data-hint="usernameHint">3–20 characters: letters, digits, underscores or Chinese</p></div>
+        <div class="auth-field" data-only="register"><label for="auth-email"><span data-t="email">Email</span> <i data-t="optional">optional</i></label>
+          <input id="auth-email" name="email" type="email" autocomplete="email" maxlength="254" autocapitalize="off" spellcheck="false">
+          <p class="auth-msg" id="auth-email-msg"></p></div>
+        <div class="auth-field"><label for="auth-password" data-t="password">Password</label>
+          <div class="auth-pw"><input id="auth-password" name="password" type="password" autocomplete="current-password" maxlength="128"><button type="button" class="auth-eye" data-eye="auth-password" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg></button></div>
+          <p class="auth-msg" id="auth-password-msg"></p></div>
+        <div class="auth-field" data-only="register"><label for="auth-confirm" data-t="confirm">Confirm password</label>
+          <div class="auth-pw"><input id="auth-confirm" name="confirm" type="password" autocomplete="new-password" maxlength="128"><button type="button" class="auth-eye" data-eye="auth-confirm" aria-pressed="false"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg></button></div>
+          <p class="auth-msg" id="auth-confirm-msg"></p></div>
+        <p class="auth-error" id="auth-error" role="alert"></p>
+        <button type="submit" class="auth-submit" id="auth-submit">Log in</button>
+      </form>
+      <p class="auth-switch"><span id="auth-switch-q">No account yet?</span> <button type="button" id="auth-switch">Sign up</button></p>
+      <p class="auth-note" data-t="note">Logging in is optional. You can search without an account.</p>
+    </div>
+  </dialog>
+
+  <dialog id="favs" class="favs" aria-labelledby="favs-title">
+    <div class="favs-sheet">
+      <div class="favs-head">
+        <h2 id="favs-title">Saved homes</h2><span class="favs-total" id="favs-total"></span>
+        <button type="button" class="auth-close" id="favs-close" aria-label="Close"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+      </div>
+      
+      <div class="favs-tools" id="favs-tools">
+        <div class="favs-seg" id="favs-seg" role="radiogroup">
+          <button type="button" role="radio" data-sort="recent">Recent</button>
+          <button type="button" role="radio" data-sort="suburb">By suburb</button>
+          <button type="button" role="radio" data-sort="price">By price</button>
+        </div>
+        <button type="button" class="favs-cmp" id="favs-cmp" aria-pressed="false">Compare</button>
+        <input class="favs-search" id="favs-search" type="search" autocomplete="off" spellcheck="false" hidden>
+      </div>
+      <ul class="favs-list" id="favs-list"></ul>
+      <p class="favs-nomatch" id="favs-nomatch" hidden></p>
+      
+      <div class="favs-actions" id="favs-actions" hidden>
+        <span class="favs-actions-hint" id="favs-actions-hint"></span>
+        <button type="button" class="favs-cmp-cancel" id="favs-cmp-cancel">Cancel</button>
+        <button type="button" class="favs-cmp-go" id="favs-cmp-go" disabled>Compare side by side (0/3)</button>
+      </div>
+      <div class="favs-empty" id="favs-empty" hidden><svg class="fav-icon" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.4 8 3.3 4.6 6.8 4.6c2.1 0 3.6 1.2 4.4 2.5.8-1.3 2.3-2.5 4.4-2.5 3.5 0 5.4 3.4 4.1 6.7-1.8 4.6-9.3 9.2-9.3 9.2z"/></svg><p class="favs-empty-t"></p><p class="favs-empty-h"></p></div>
+    </div>
+  </dialog>
+<script src="/static/map-glass.js">
+</script>
+<script src="/static/i18n.js">
+</script>
+<script src="/static/app.js">
+</script>
+<script src="/static/auth.js">
+</script>
+<script src="/static/favorites.js">
+</script>
+<script>(function () {
+  var revision = 'ios-20261003-3';
+  var diagnostic = window.__showroomDiagnostic = { revision: revision, module: '等待加载' };
+  var enabled = /(?:^|[?&])background-status=1(?:&|$)/.test(location.search);
+  window.addEventListener('error', function (event) {
+    if (event.target && event.target.id === 'showroom-module') diagnostic.module = '模块或依赖加载失败';
+  }, true);
+  if (!enabled) return;
+  var panel = document.createElement('pre');
+  panel.id = 'background-status';
+  panel.style.cssText = 'position:fixed;z-index:10000;left:8px;right:8px;bottom:12px;max-height:45vh;overflow:auto;margin:0;padding:10px;background:rgba(255,255,255,.96);border:1px solid #bbb;border-radius:8px;color:#222;font:12px/1.45 monospace;white-space:pre-wrap;pointer-events:none';
+  document.body.appendChild(panel);
+  var importMap = typeof HTMLScriptElement.supports === 'function' ? HTMLScriptElement.supports('importmap') : null;
+  var phases = { 'module-ready':'模块已执行', 'loading-cameras':'加载相机资料', 'creating-renderer':'创建图形渲染器', 'loading-assets':'加载模型、贴图或解码器', 'building-scene':'建立沙盘', 'first-render':'首次绘制', 'ready':'新版背景已就绪', 'context-lost':'图形上下文丢失' };
+  var reasons = { 'missing-stage':'背景容器缺失', 'webgl2-unavailable':'WebGL2 不可用', 'webgl2-error':'WebGL2 检测异常', 'draco-worker-error':'DRACO 工作线程失败' };
+  var count = 0;
+  function render() {
+    var report = window.__showroom || {};
+    var errorType = report.error && /^(Error|TypeError|ReferenceError|SyntaxError|AbortError|NetworkError|SecurityError)(?=:|$)/.exec(report.error);
+    var lines = [
+      '背景诊断 ' + revision,
+      '模块版本: ' + (report.revision || '尚未执行'),
+      'ImportMap: ' + (importMap === null ? '未知' : importMap ? '支持' : '不支持'),
+      'WebGL2: ' + (typeof report.webgl2 === 'boolean' ? report.webgl2 ? '可用' : '不可用' : '尚未检测'),
+      '步骤: ' + (phases[report.phase] || diagnostic.module),
+      '状态: ' + (report.stage || '等待模块'),
+      '原因: ' + (reasons[report.reason] || (errorType && errorType[1]) || '未记录'),
+      '失败资源: ' + (report.failedAsset || '无'),
+      '图形上下文: ' + (report.contextLost ? '已丢失' : '未报告丢失')
+    ];
+    if (report.assetStartedMs) lines.push('资产用时: ' + Math.round((report.loadMs || (performance.now() - report.assetStartedMs)) / 1000) + ' 秒');
+    if (report.decoder) lines.push('DRACO: ' + report.decoder.completed + '/' + report.decoder.started + ' 完成;失败 ' + report.decoder.failed);
+    if (report.imageQueue) lines.push('图片队列: 等待 ' + report.imageQueue.queued + '; 进行 ' + report.imageQueue.active + '/2; 峰值 ' + report.imageQueue.peak);
+    if (report.decoder) lines.push('DRACO worker: 上限 ' + report.decoder.workerLimit + '; ' + (report.decoder.workersDisposed ? '已释放' : '使用中'));
+    if (report.houseTarget) lines.push('户型缓冲: ' + (report.houseTarget.allocated ? report.houseTarget.width + '×' + report.houseTarget.height : '尚未分配'));
+    if (report.images) lines.push('内嵌贴图: ' + report.images.completed + '/' + report.images.started + ' 完成;失败 ' + report.images.failed + ' (' + (report.textureLoader || '未知') + ')');
+    if (report.assets) {
+      var labels = {downloading:'下载',decoding:'解析/解码',loading:'加载',failed:'失败'};
+      Object.keys(report.assets).filter(function(name){return report.assets[name].state !== 'ready';}).slice(0,3).forEach(function(name){
+        var asset=report.assets[name]; var progress=typeof asset.loaded==='number'?' '+(asset.loaded/1048576).toFixed(1)+'/'+(asset.total>0?(asset.total/1048576).toFixed(1):'?')+' MB':'';
+        lines.push('等待: '+name+' '+(labels[asset.state]||asset.state)+progress);
+      });
+    }
+    panel.textContent = lines.join('\n');
+    count++;
+    if (count >= 180) clearInterval(timer);
+  }
+  var timer = setInterval(render, 500);
+  render();
+})();
+</script>
+
+<script id="showroom-module" type="module" src="/static/showroom/showroom.mjs?v=ios-20261003-3">
+</script>
+</body>
+</html>

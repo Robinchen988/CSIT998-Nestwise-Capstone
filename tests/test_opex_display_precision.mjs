@@ -1,0 +1,23 @@
+import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
+const file = process.argv[2] || fileURLToPath(new URL('../app/web/app.js', import.meta.url));
+const src = fs.readFileSync(file, 'utf8');
+const m = src.match(/const pctText = (r => \{[\s\S]*?\n {6}\});/);
+let fails = 0;
+const check = (ok, msg) => { console.log((ok ? 'ok   ' : 'FAIL ') + msg); if (!ok) fails++; };
+check(!!m, 'pctText found in ' + file);
+if (!m) process.exit(1);
+const pctText = new Function('return ' + m[1])();
+const MAX = parseFloat(src.match(/oi\.max = '([^']+)'/)[1]);
+const cases = [[0.284, '28.4'], [0.28, '28'], [0, '0'], [0.0001, '0.01'], [1e-7, '0.00001'], [0.05, '5'], [0.3, '30'], [0.5, '50'], [0.999, '99.9'], [0.9999, '99.99'],
+  [0.9999999999999999, '99.99999999999999'], [0.123456789012345, '12.3456789012345']];
+for (const [r, want] of cases) check(pctText(r) === want, `pctText(${r}) = '${pctText(r)}' (expected '${want}')`);
+const old = r => String(Number((r * 100).toPrecision(12)));
+check(old(0.9999999999999999) === '100', "the superseded toPrecision(12) version printed '100' for 0.9999999999999999 (why it was replaced)");
+check(String(0.9999999999999999) === '0.9999999999999999' && 0.9999999999999999 < 1, 'the extreme rate is a real double < 1 (the backend accepts it)');
+for (const [r] of cases) check(Number(pctText(r)) < 100 && Number(pctText(r)) >= 0, `value for ${r} lies in [0, 100)`);
+check(Number(pctText(0.9999999999999999)) <= MAX && 100 > MAX, `input max (${MAX}) accepts the extreme display value and rejects 100`);
+check(pctText(1) === '100' && 1 >= 1, "rate 1 (outside the allowed [0, 1)) would display '100' - it is not a reachable snapshot value (assumptions.set_rate rejects it)");
+check(cases.every(([r]) => !/\.\d*0$/.test(pctText(r)) && !/e/i.test(pctText(r))), 'no trailing zeros and no exponent notation in any output');
+console.log(fails ? `FAILED: ${fails}` : 'ALL PASSED');
+process.exit(fails ? 1 : 0);
