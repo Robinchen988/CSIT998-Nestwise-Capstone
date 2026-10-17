@@ -73,7 +73,5 @@ for (const lang of ['zh', 'en']) {
   check(`UI.${lang}.askingPrice.sale`, /(成交|sale)/i.test(T.askingPrice) && /(成交|sold)/i.test(T.fav.price), 'price label and favourites label both say sale');
   check(`UI.${lang}.rank`, !/listing/i.test(T.rank(90)), `score-rank sentence does not call records "listings" -> ${T.rank(90)}`);
 }
-const dir = process.env.CAPSTONE_AUDIT_DIR;
-if (dir) { try { fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, 'static_contract_assertions.json'), JSON.stringify({ kind: 'static_contract_only', assertions: log }, null, 1)); } catch (e) {  } }
 console.log(failures.length ? `FAILED: ${failures.length}` : `ALL PASSED (${log.length} static contract assertions)`);
 process.exit(failures.length ? 1 : 0);

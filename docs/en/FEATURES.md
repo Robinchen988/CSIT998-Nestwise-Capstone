@@ -78,7 +78,7 @@ Keep talking and the assistant edits the current search instead of starting over
   - Only what you mention changes; everything else is kept.
   - Relative requests ("cheaper", "quieter") are measured against the **actual current results**.
   - Asking for something "a bit" more means at least a 10-point shift on a 0–100 score.
-- **Trade-offs are handled honestly.** Saying "lively" first and then "a bit quieter" keeps
+- **Trade-offs are made visible.** Saying "lively" first and then "a bit quieter" keeps
   both qualities and shifts the balance between their scores. If a threshold has to be
   relaxed, the assistant says so.
 - If a change leaves no matches, the previous results are kept and you are told why.
@@ -145,7 +145,7 @@ Each number carries its origin label: measured/statutory, assumption, or model.
 
 - **LAN:** `python serve.py --lan` prints an address for phones on the same Wi-Fi.
 
-## 10. What it deliberately does not do
+## 10. What it does not do
 
 - Show listings or numbers that are not in the data. The no-result path never calls the LLM.
 - Estimate travel time. All distances are straight-line.

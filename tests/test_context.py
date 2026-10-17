@@ -10,7 +10,7 @@ from app.amenities.context import (
 )
 
 info = warm_up()
-assert info["baseline"], "缺分位基准,请先跑 pipeline/build_context_baseline.py"
+assert info["baseline"], "Context baseline missing. Restore the data folder from the repository."
 assert info["points"] > 100_000, f"地理点太少({info['points']})"
 assert info["attributes"] >= 10 and info["unsupported"] >= 8
 assert not info["missing_quantiles"], f"这些证据缺分位表:{info['missing_quantiles']}"

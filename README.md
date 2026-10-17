@@ -18,7 +18,7 @@ The LLM never invents listings or numbers. It turns your sentence into filters a
 writes the explanation. All the data and every calculation come from the database and
 plain Python formulas. If nothing matches, that path skips the LLM entirely.
 
-➡️ **Full feature list:** [`docs/en/FEATURES.md`](docs/en/FEATURES.md)
+**Full feature list:** [`docs/en/FEATURES.md`](docs/en/FEATURES.md)
 
 | Homepage | Results, filters and map |
 |---|---|

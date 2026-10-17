@@ -200,8 +200,8 @@ def _load() -> dict:
         return _data
     if not _JSONL.exists():
         raise RuntimeError(
-            "规划分区数据缺失(" + _JSONL.name + ")。"
-            "请先运行:python pipeline/fetch_planning.py")
+            "Planning zone data missing (" + _JSONL.name + "). "
+            "Restore the data folder from the repository.")
 
     buckets = _read_cache()
     if buckets is None:

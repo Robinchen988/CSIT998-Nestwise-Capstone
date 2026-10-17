@@ -281,7 +281,7 @@ check("GLOBAL" not in p and "$199,999" in p, "[explain race] global flips while 
 
 for review_lang in ("zh", "en"):
     decimal_prompt = explain_prompt(DescBox(0.2, 0), [{**mm[0], "assumptions": {"opex_rate": 0.284, "other_acquisition_costs": 199999}}], lang=review_lang)
-    check("28.4%" in decimal_prompt, f"[review precision {review_lang}] the real .284 assumption is described as 28.4%, not rounded to 28%")
+    check("28.4%" in decimal_prompt, f"[{review_lang}] the real .284 assumption is described as 28.4%, not rounded to 28%")
 RS = load(ROOT / "app/orchestration/refinement.py", ["snapshot"], pre={"deepcopy": __import__("copy").deepcopy})
 review_rows = [(i, 1000000, 50000, 3, "house") for i in range(1, 301)]
 for review_lang in ("zh", "en"):
@@ -296,15 +296,15 @@ for review_lang in ("zh", "en"):
         review_state.update(review_G[node](review_state))
     restored = {**review_state, **review_G["rank"](review_state)}
     check(restored["metrics"][0]["assumptions"]["other_acquisition_costs"] == restored["assumption_snap"]["other_costs"] == restored["roi_pool"]["other_costs"] == 2000,
-          f"[review rollback {review_lang}] row, assumption_snap and roi_pool all restore fees 2000")
+          f"[{review_lang}] row, assumption_snap and roi_pool all restore fees 2000")
     check([m["id"] for m in restored["metrics"]] == [m["id"] for m in old_state["metrics"]] and restored["params"] == old_state["params"],
-          f"[review rollback {review_lang}] prior IDs and filters unchanged")
+          f"[{review_lang}] prior IDs and filters unchanged")
     notice = restored.get("turn_notice") or ""
     check(("扩容上限" in notice and "池外可能还有" in notice) if review_lang == "zh" else
           ("expansion cap reached" in notice and "properties outside it may still match" in notice),
-          f"[review rollback {review_lang}] capped failed refinement discloses outside-pool possibility")
+          f"[{review_lang}] capped failed refinement discloses outside-pool possibility")
 legacy_snap = RS["snapshot"]({"params": {}, "metrics": []})
-check(legacy_snap["roi_pool"] is None and legacy_snap["assumption_snap"] is None, "[review legacy] missing metadata remains None; no invented fee default")
+check(legacy_snap["roi_pool"] is None and legacy_snap["assumption_snap"] is None, "missing metadata remains None; no invented fee default")
 
 print("FAILED: %d" % len(failures) if failures else "ALL PASSED")
 sys.exit(1 if failures else 0)

@@ -5,7 +5,7 @@ import sys
 import types
 from pathlib import Path
 
-ROOT = Path(sys.argv[1]).resolve() if len(sys.argv)>1 and sys.argv[1] != "--legacy" else Path(__file__).resolve().parents[1]
+ROOT = Path(sys.argv[1]).resolve() if len(sys.argv)>1 else Path(__file__).resolve().parents[1]
 GRAPH = ROOT / "app/orchestration/graph.py"
 errors = []
 
@@ -22,15 +22,6 @@ def load(path, names, ns):
         ):
             exec(compile(ast.Module([node], []), str(path), "exec"), ns)
     return ns
-
-if sys.argv[1:] == ["--legacy"]:
-    old = Path(r"D:\projects\capstone-test-20260930-1340\wave07\work\parking_visibility_candidate\app\orchestration\graph.py")
-    n = load(old, {"_PARKING_OVERLAY_RE", "_PARKING_ASK_RE", "_asks_parking", "_without_property_parking"}, {"re": re})
-    for text in ("near a public car park", "靠近公共停车场", "near The Garage Cafe"):
-        check(not n["_asks_parking"](text) and n["_without_property_parking"](text) == text,
-              f"legacy should preserve public/place query: {text}")
-    print(f"RESULT {len(errors)} failed")
-    sys.exit(bool(errors))
 
 source = GRAPH.read_text(encoding="utf-8")
 n = load(GRAPH, {"_PROPERTY_PARKING_ASK", "_PROPERTY_PARKING_LABELS", "_PUBLIC_PARKING_RE", "_PARKING_TERM_RE", "_PROPERTY_PARKING_RE",
@@ -100,17 +91,17 @@ for query, semantic, description, expected_semantic, expected_description in (
     result = sanitize({"semantic_query": semantic, "description_query": description, "bedrooms": 3}, query)
     check(kind(query) == "property" and result["unsupported_asks"] == ["房源车位"]
           and result["semantic_query"] == expected_semantic and result["description_query"] == expected_description
-          and result["bedrooms"] == 3, f"[V3 review] owned-space intent removes derived term, keeps other needs: {query}")
+          and result["bedrooms"] == 3, f"owned-space intent removes derived term, keeps other needs: {query}")
 
 query = "near The Garage Cafe and a house with a garage"
 result = sanitize({"semantic_query": "near The Garage Cafe and a house with a garage",
                    "description_query": "near The Garage Cafe"}, query)
 check(result["unsupported_asks"] == ["房源车位"] and "The Garage Cafe" in result["semantic_query"]
-      and result["description_query"] == "near The Garage Cafe", "[V3 review] explicit owned-space request does not strip the named place")
+      and result["description_query"] == "near The Garage Cafe", "explicit owned-space request does not strip the named place")
 result = sanitize({"semantic_query": "near The Garage Cafe and a house with a garage",
                    "description_query": "garage"}, query)
 check(result["description_query"] == "garage" and result["unsupported_asks"] == ["房源车位"],
-      "[V3 review] ambiguous bare garage from a mixed named-place request is retained with warning")
+      "ambiguous bare garage from a mixed named-place request is retained with warning")
 
 check("要带车位的" not in source and "The Garage Cafe" in source, "parser prompt distinguishes public venue from owned space")
 def unavailable(*_args, **_kwargs):
@@ -146,9 +137,9 @@ for text, expected in (("near a public car park", None), ("a house with a garage
 
 query = "a house near a public car park with a garage"
 result = sanitize({"semantic_query":"house near public parking with garage","description_query":"near public parking"}, query)
-check(result["semantic_query"] == "house near public parking" and result["description_query"]=="near public parking" and result["unsupported_asks"]==["房源车位"], "[reviewer] mixed derived public parking survives owned-garage removal")
+check(result["semantic_query"] == "house near public parking" and result["description_query"]=="near public parking" and result["unsupported_asks"]==["房源车位"], "mixed derived public parking survives owned-garage removal")
 translation = next(node for node in ast.parse((ROOT/"app/i18n.py").read_text(encoding="utf-8")).body if isinstance(node,ast.Assign) and any(isinstance(t,ast.Name) and t.id=="UNSUPPORTED_KEY_EN" for t in node.targets))
 lookup=ast.literal_eval(translation.value)
-check(lookup.get("房源车位")=="property car spaces", "[reviewer] canonical key is translated for the English conditions card")
+check(lookup.get("房源车位")=="property car spaces", "canonical key is translated for the English conditions card")
 print(f"RESULT {len(errors)} failed")
 sys.exit(bool(errors))

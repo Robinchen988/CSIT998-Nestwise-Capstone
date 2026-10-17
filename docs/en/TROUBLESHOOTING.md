@@ -68,7 +68,7 @@ Chrome or Edge with hardware acceleration shows the 3D scene.
 ### The map looks like a standard colourful street map
 
 The frosted vector basemap needs WebGL and access to `tiles.openfreemap.org`. Without
-them it falls back to OpenStreetMap raster tiles on purpose, and everything else still works.
+them it falls back to OpenStreetMap raster tiles, and everything else still works.
 
 ### Search returns nothing for everything
 

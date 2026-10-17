@@ -53,11 +53,9 @@ function projectedMaterial(tex, wideVP, { instanced = false, shadow = false, fad
       void main() {
         vec4 c = texture2D(uTex, vUv);
         ${shadow ? 'gl_FragColor = vec4(0.0, 0.0, 0.0, c.a * uOpacity);' : `
-          // 按屏幕像素宽度覆盖轮廓,由 MSAA 平滑树叶边缘,避免硬裁切随镜头闪烁。
           float width = max(fwidth(c.a), .001);
           float coverage = smoothstep(.5 - width, .5 + width, c.a);
           if (coverage <= 0.0) discard;
-          // 离屏透明层需要预乘颜色,否则 MSAA 轮廓在合成时出现发白亮边。
           gl_FragColor = vec4(c.rgb ${premultiply ? '* coverage' : ''}, coverage);
         `}
         #include <colorspace_fragment>
@@ -78,7 +76,6 @@ const tiltMaterial = new THREE.ShaderMaterial({
         float a = float(i) * 2.39996; float rr = sqrt(float(i) / 16.0) * r;
         vec2 o = vec2(cos(a), sin(a)) * rr * uTexel;
         vec4 city = texture2D(uTex, vUv + o), house = texture2D(uHouseTex, vUv + o);
-        // 透明底离屏层已由混合得到预乘 RGB,不要再乘一次 house.a。
         acc += vec4(city.rgb * (1.0 - house.a * uHouseOpacity) + house.rgb * uHouseOpacity, 1.0); w += 1.0;
       }
       gl_FragColor = acc / w;
